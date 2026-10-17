@@ -6,12 +6,12 @@ import { SiteConfig } from '../types/portfolio';
  */
 export const siteConfig: SiteConfig = {
   developer: {
-    name: 'Alex Rivera',
-    role: 'Aspiring Fullstack Developer',
-    eyebrow: 'FULLSTACK DEVELOPER',
+    name: 'Faza Ghaisan Abdillah',
+    role: 'Software Engineer',
+    eyebrow: 'SOFTWARE ENGINEER',
     headline: 'Building digital experiences that are simple, useful, and impactful.',
     shortBio:
-      "I'm an aspiring Fullstack Developer who enjoys turning ideas into functional, user-friendly web applications. I'm continuously learning, building projects, and improving my engineering skills.",
+      "I'm an software engineer who enjoys turning ideas into functional, user-friendly web applications. I'm continuously learning, building projects, and improving my engineering skills.",
     fullBio: [
       "I began my programming journey driven by curiosity about how modern software powers everyday life. Over time, that curiosity evolved into a dedicated commitment to building reliable web applications across the entire stack.",
       "On the frontend, I focus on crafting clean, accessible interfaces using React, TypeScript, and semantic HTML. On the backend, I enjoy structuring clean RESTful APIs, modeling relational databases, and understanding how data securely flows through distributed systems.",
