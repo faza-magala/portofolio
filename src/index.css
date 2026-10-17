@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-bg-primary: #F8FBFF;
+    --color-bg-secondary: #EAF6FF;
+    --color-blue-primary: #3898EC;
+    --color-blue-accent: #60B5FF;
+    --color-text-dark: #172B4D;
+    --color-text-secondary: #5B6B82;
+    --color-border: #DCEAF7;
+    --color-white: #FFFFFF;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    color: var(--color-text-dark);
+    background-color: var(--color-bg-primary);
+  }
+
+  /* Accessibility: Disable smooth scrolling and fast animations if user requested reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Accessible focus indicators across interactive elements */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid #3898EC;
+    outline-offset: 2px;
+  }
+}
+
+/* Custom subtle scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F8FBFF;
+}
+::-webkit-scrollbar-thumb {
+  background: #DCEAF7;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #60B5FF;
+}
+
+/* Subtle dot grid pattern utility */
+.bg-grid-subtle {
+  background-image: radial-gradient(rgba(56, 152, 236, 0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
