@@ -1,12 +1,17 @@
 import React from 'react';
 import { BookOpen, CheckCircle, Clock, Target } from 'lucide-react';
 import { learningJourneyData } from '../../data/learning';
+import { useLearningJourney } from '../../hooks/usePortfolioData';
 import { Container } from '../ui/Container';
 import { SectionHeading } from '../ui/SectionHeading';
 import { Badge } from '../ui/Badge';
 import { Card } from '../ui/Card';
 
 export const LearningJourney: React.FC = () => {
+  const { data: remoteLearning } = useLearningJourney();
+
+  const activeLearning = remoteLearning && remoteLearning.length > 0 ? remoteLearning : learningJourneyData;
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'Milestone':
@@ -41,7 +46,7 @@ export const LearningJourney: React.FC = () => {
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {learningJourneyData.map((item) => (
+          {activeLearning.map((item) => (
             <Card
               key={item.id}
               hoverable

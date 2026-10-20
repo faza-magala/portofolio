@@ -1,12 +1,24 @@
 import React from 'react';
 import { ArrowRight, Mail, Terminal, Sparkles, CheckCircle2 } from 'lucide-react';
 import { siteConfig } from '../../config/site';
+import { useProfile } from '../../hooks/usePortfolioData';
 import { Button } from '../ui/Button';
 import { Container } from '../ui/Container';
 import { Badge } from '../ui/Badge';
 
 export const Hero: React.FC = () => {
+  const { data: profile } = useProfile();
   const coreStack = ['TypeScript', 'React', 'Node.js', 'PostgreSQL', 'Tailwind CSS'];
+
+  const name = profile?.name || siteConfig.developer.name;
+  const role = profile?.role || siteConfig.developer.role;
+  const eyebrow = profile?.eyebrow || siteConfig.developer.eyebrow;
+  const headline = profile?.headline || siteConfig.developer.headline;
+  const shortBio = profile?.shortBio || siteConfig.developer.shortBio;
+  const location = profile?.location || siteConfig.developer.location;
+  const isAvailable = profile ? profile.available : siteConfig.developer.status.available;
+  const statusLabel = profile?.statusLabel || siteConfig.developer.status.label;
+  const avatarInitials = profile?.avatarInitials || siteConfig.developer.avatarInitials;
 
   return (
     <section
@@ -35,29 +47,29 @@ export const Hero: React.FC = () => {
           {/* Left Column: Hero Content */}
           <div className="lg:col-span-7 flex flex-col items-start text-left">
             {/* Status / Availability Badge */}
-            {siteConfig.developer.status.available && (
+            {isAvailable && (
               <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#DCEAF7] bg-white px-3.5 py-1.5 text-xs font-medium text-[#172B4D] shadow-subtle">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span>{siteConfig.developer.status.label}</span>
+                <span>{statusLabel}</span>
               </div>
             )}
 
             {/* Eyebrow */}
             <p className="mb-3 text-xs font-bold uppercase tracking-wider text-[#3898EC]">
-              {siteConfig.developer.eyebrow}
+              {eyebrow}
             </p>
 
             {/* Headline */}
             <h1 className="text-3xl font-extrabold tracking-tight text-[#172B4D] sm:text-4xl md:text-5xl lg:text-5xl lg:leading-[1.15]">
-              {siteConfig.developer.headline}
+              {headline}
             </h1>
 
             {/* Supporting text */}
             <p className="mt-5 text-base sm:text-lg leading-relaxed text-[#5B6B82] max-w-xl">
-              {siteConfig.developer.shortBio}
+              {shortBio}
             </p>
 
             {/* Action Buttons */}
@@ -100,7 +112,6 @@ export const Hero: React.FC = () => {
           {/* Right Column: Clean Developer Visual Element & Portrait Card */}
           <div className="lg:col-span-5 flex justify-center lg:justify-end">
             <div className="relative w-full max-w-md">
-              {/* Decorative Card container */}
               <div className="relative overflow-hidden rounded-3xl border border-[#DCEAF7] bg-white p-6 shadow-card transition-all duration-300">
                 {/* Header of code card */}
                 <div className="flex items-center justify-between border-b border-[#DCEAF7] pb-4 mb-4">
@@ -117,19 +128,19 @@ export const Hero: React.FC = () => {
 
                 {/* Profile Card Snippet */}
                 <div className="flex items-center gap-4 p-3 rounded-2xl bg-[#F8FBFF] border border-[#DCEAF7] mb-4">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#3898EC] to-[#60B5FF] text-xl font-bold font-mono text-white shadow-sm">
-                    {siteConfig.developer.avatarInitials}
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#3898EC] to-[#60B5FF] text-xl font-bold font-mono text-white shadow-sm overflow-hidden">
+                    {profile?.avatarUrl ? (
+                      <img src={profile.avatarUrl} alt={name} className="w-full h-full object-cover" />
+                    ) : (
+                      avatarInitials
+                    )}
                   </div>
                   <div className="min-w-0">
-                    <p className="font-semibold text-sm text-[#172B4D] truncate">
-                      {siteConfig.developer.name}
-                    </p>
-                    <p className="text-xs text-[#5B6B82] truncate">
-                      {siteConfig.developer.location}
-                    </p>
+                    <p className="font-semibold text-sm text-[#172B4D] truncate">{name}</p>
+                    <p className="text-xs text-[#5B6B82] truncate">{location}</p>
                     <div className="mt-1 flex items-center gap-1 text-[11px] font-medium text-emerald-700">
                       <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
-                      <span>Ready to build & contribute</span>
+                      <span>{role} • Open to opportunities</span>
                     </div>
                   </div>
                 </div>
@@ -148,7 +159,7 @@ const developer = {
     "Secure API design",
     "Continuous learning",
   ],
-  status: "Ready for junior fullstack roles",
+  status: "${statusLabel}",
 };`}</code>
                 </pre>
               </div>

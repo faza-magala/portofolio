@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Github, ExternalLink, Code2, Layers, AlertCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Github, ExternalLink, Code2, Layers, ArrowRight } from 'lucide-react';
 import { projectsData } from '../../data/projects';
-import { ProjectCategory } from '../../types/portfolio';
+import { useProjects } from '../../hooks/usePortfolioData';
 import { isSafeUrl, getExternalLinkProps } from '../../lib/validators';
 import { Container } from '../ui/Container';
 import { SectionHeading } from '../ui/SectionHeading';
@@ -9,19 +10,17 @@ import { Badge } from '../ui/Badge';
 import { Card } from '../ui/Card';
 
 export const Projects: React.FC = () => {
-  const [filter, setFilter] = useState<ProjectCategory | 'All'>('All');
+  const { data: remoteProjects } = useProjects();
+  const [filter, setFilter] = useState<string>('All');
 
-  const categories: (ProjectCategory | 'All')[] = [
-    'All',
-    'Full-Stack',
-    'Frontend',
-    'Backend / API',
-  ];
+  const activeProjectsList = remoteProjects && remoteProjects.length > 0 ? remoteProjects : projectsData;
+
+  const categories = ['All', 'Full-Stack', 'Frontend', 'Backend / API'];
 
   const filteredProjects =
     filter === 'All'
-      ? projectsData
-      : projectsData.filter((project) => project.category === filter);
+      ? activeProjectsList
+      : activeProjectsList.filter((project) => project.category === filter);
 
   return (
     <section id="projects" aria-label="Featured Projects" className="py-20 bg-white">
@@ -29,7 +28,7 @@ export const Projects: React.FC = () => {
         <SectionHeading
           eyebrow="PORTFOLIO PROJECTS"
           title="Practical applications built with care."
-          description="Explore sample project templates demonstrating full-stack architecture, clean TypeScript, and responsive interfaces. Easily customize these entries with your own work."
+          description="Explore projects demonstrating full-stack architecture, clean TypeScript, and responsive interfaces. Managed dynamically via CMS."
         />
 
         {/* Filter Pills */}
@@ -66,49 +65,42 @@ export const Projects: React.FC = () => {
             const demoProps = getExternalLinkProps(project.liveDemoUrl);
             const repoProps = getExternalLinkProps(project.sourceCodeUrl);
 
+            // slug fallback
+            const slug = 'slug' in project && project.slug ? project.slug : project.id;
+
             return (
               <Card
                 key={project.id}
                 hoverable
                 className="flex flex-col justify-between overflow-hidden p-0 border-[#DCEAF7] bg-white group"
               >
-                {/* Visual Placeholder / Mockup Area */}
+                {/* Visual Area */}
                 <div className="relative aspect-video w-full overflow-hidden bg-[#F8FBFF] border-b border-[#DCEAF7] p-5 flex flex-col justify-between">
-                  {/* Decorative background dot pattern */}
-                  <div
-                    className="absolute inset-0 bg-grid-subtle opacity-50"
-                    aria-hidden="true"
-                  />
+                  <div className="absolute inset-0 bg-grid-subtle opacity-50" aria-hidden="true" />
 
-                  {/* Top Bar of Project Visual */}
+                  {/* Top Bar */}
                   <div className="relative z-10 flex items-center justify-between">
                     <span className="flex items-center gap-1.5 text-xs font-mono font-medium text-[#172B4D]">
                       <Code2 className="h-3.5 w-3.5 text-[#3898EC]" aria-hidden="true" />
-                      {project.imagePlaceholder?.label || project.title}
+                      {project.title}
                     </span>
                     <Badge variant="subtle" size="sm">
                       {project.category}
                     </Badge>
                   </div>
 
-                  {/* Code snippet illustration */}
-                  {project.imagePlaceholder?.codeSnippet ? (
-                    <div className="relative z-10 my-auto rounded-lg bg-[#172B4D]/95 p-3 text-[11px] font-mono text-[#EAF6FF] shadow-subtle overflow-hidden">
-                      <pre className="overflow-x-hidden text-ellipsis line-clamp-3 leading-tight opacity-90">
-                        {project.imagePlaceholder.codeSnippet}
-                      </pre>
+                  {/* Cover or placeholder */}
+                  {'coverImageUrl' in project && project.coverImageUrl ? (
+                    <div className="relative z-10 my-auto rounded-lg overflow-hidden h-24 max-h-24">
+                      <img
+                        src={project.coverImageUrl}
+                        alt={project.title}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   ) : (
                     <div className="relative z-10 flex items-center justify-center my-auto">
                       <Layers className="h-10 w-10 text-[#60B5FF]/50" aria-hidden="true" />
-                    </div>
-                  )}
-
-                  {/* Sample label indicator */}
-                  {project.sampleNotice && (
-                    <div className="relative z-10 flex items-center gap-1 text-[10px] text-[#5B6B82] bg-white/90 backdrop-blur-xs px-2 py-0.5 rounded border border-[#DCEAF7] w-fit">
-                      <AlertCircle className="h-3 w-3 text-[#3898EC]" aria-hidden="true" />
-                      <span>Editable Template</span>
                     </div>
                   )}
                 </div>
@@ -116,9 +108,11 @@ export const Projects: React.FC = () => {
                 {/* Content Area */}
                 <div className="flex flex-1 flex-col justify-between p-6">
                   <div>
-                    <h3 className="text-lg font-bold text-[#172B4D] group-hover:text-[#3898EC] transition-colors">
-                      {project.title}
-                    </h3>
+                    <Link to={`/projects/${slug}`}>
+                      <h3 className="text-lg font-bold text-[#172B4D] group-hover:text-[#3898EC] transition-colors">
+                        {project.title}
+                      </h3>
+                    </Link>
                     <p className="mt-2 text-xs sm:text-sm text-[#5B6B82] leading-relaxed">
                       {project.shortDescription}
                     </p>
@@ -126,7 +120,7 @@ export const Projects: React.FC = () => {
                     {/* Highlights bullet points if present */}
                     {project.highlights && project.highlights.length > 0 && (
                       <ul className="mt-3.5 space-y-1.5 text-xs text-[#5B6B82]">
-                        {project.highlights.map((h, i) => (
+                        {project.highlights.slice(0, 3).map((h, i) => (
                           <li key={i} className="flex items-start gap-1.5">
                             <span className="text-[#3898EC] font-bold">•</span>
                             <span>{h}</span>
@@ -148,48 +142,40 @@ export const Projects: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Card Action Buttons (Safe & Graceful links) */}
-                  <div className="mt-6 flex items-center gap-3 pt-4 border-t border-[#DCEAF7]/80">
-                    {hasRepo ? (
-                      <a
-                        href={repoProps.href}
-                        target={repoProps.target}
-                        rel={repoProps.rel}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#172B4D] hover:text-[#3898EC] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3898EC] rounded-md p-1"
-                        aria-label={`View source code for ${project.title}`}
-                      >
-                        <Github className="h-4 w-4" aria-hidden="true" />
-                        <span>Source Code</span>
-                      </a>
-                    ) : (
-                      <span
-                        className="inline-flex items-center gap-1.5 text-xs font-medium text-[#5B6B82]/60 cursor-not-allowed"
-                        title="Repository link will be available upon project release"
-                      >
-                        <Github className="h-4 w-4" aria-hidden="true" />
-                        <span>Code Private</span>
-                      </span>
-                    )}
+                  {/* Card Action Buttons */}
+                  <div className="mt-6 flex items-center justify-between gap-2 pt-4 border-t border-[#DCEAF7]/80">
+                    <Link
+                      to={`/projects/${slug}`}
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-[#3898EC] hover:text-[#2483D6]"
+                    >
+                      <span>Details</span>
+                      <ArrowRight size={13} />
+                    </Link>
 
-                    <div className="ml-auto">
-                      {hasDemo ? (
+                    <div className="flex items-center gap-2">
+                      {hasRepo && (
+                        <a
+                          href={repoProps.href}
+                          target={repoProps.target}
+                          rel={repoProps.rel}
+                          className="p-1.5 text-[#172B4D] hover:text-[#3898EC] transition-colors"
+                          title="Source Code"
+                        >
+                          <Github className="h-4 w-4" aria-hidden="true" />
+                        </a>
+                      )}
+
+                      {hasDemo && (
                         <a
                           href={demoProps.href}
                           target={demoProps.target}
                           rel={demoProps.rel}
-                          className="inline-flex items-center gap-1 rounded-lg bg-[#3898EC] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#2483d6] transition-colors shadow-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3898EC]"
-                          aria-label={`Visit live demo for ${project.title}`}
+                          className="inline-flex items-center gap-1 rounded-lg bg-[#3898EC] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#2483d6] transition shadow-subtle"
+                          title="Live Demo"
                         >
-                          <span>Live Demo</span>
+                          <span>Demo</span>
                           <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
                         </a>
-                      ) : (
-                        <span
-                          className="inline-flex items-center gap-1 rounded-lg bg-[#EAF6FF] px-3 py-1.5 text-xs font-medium text-[#5B6B82] border border-[#DCEAF7]"
-                          title="Live deployment URL will be added when deployed"
-                        >
-                          <span>Demo Coming Soon</span>
-                        </span>
                       )}
                     </div>
                   </div>

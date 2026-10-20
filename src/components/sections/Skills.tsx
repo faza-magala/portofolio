@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Layout, Server, Database, Wrench, Sparkles } from 'lucide-react';
 import { skillsData } from '../../data/skills';
+import { useSkills } from '../../hooks/usePortfolioData';
 import { SkillCategory } from '../../types/portfolio';
 import { Container } from '../ui/Container';
 import { SectionHeading } from '../ui/SectionHeading';
@@ -8,7 +9,10 @@ import { Badge } from '../ui/Badge';
 import { Card } from '../ui/Card';
 
 export const Skills: React.FC = () => {
+  const { data: remoteSkills } = useSkills();
   const [selectedCategory, setSelectedCategory] = useState<SkillCategory | 'all'>('all');
+
+  const activeSkillsList = remoteSkills && remoteSkills.length > 0 ? remoteSkills : skillsData;
 
   const categories: { id: SkillCategory | 'all'; label: string; icon: React.ReactNode }[] = [
     { id: 'all', label: 'All Technologies', icon: <Sparkles className="h-4 w-4" /> },
@@ -20,8 +24,8 @@ export const Skills: React.FC = () => {
 
   const filteredSkills =
     selectedCategory === 'all'
-      ? skillsData
-      : skillsData.filter((skill) => skill.category === selectedCategory);
+      ? activeSkillsList
+      : activeSkillsList.filter((skill) => skill.category === selectedCategory);
 
   const getProficiencyVariant = (proficiency?: string) => {
     switch (proficiency) {
