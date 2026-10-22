@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { portfolioRepository } from '../repositories/portfolio.repository';
 import { authRepository } from '../repositories/auth.repository';
-import { loginSchema, changePasswordSchema, userCreateSchema } from '../../../shared/src/schemas';
+import { userCreateSchema } from '../../../shared/src/schemas';
 import { requireAuth, type AuthContextVariables } from '../middleware/auth.middleware';
 import { cloudinaryService } from '../services/cloudinary.service';
 import {
@@ -360,6 +360,9 @@ adminRoutes.post('/users', async (c) => {
   }
   const { username, email, password, role } = parsed.data;
   const user = await authRepository.createUser({ username, email, password, role });
+  if (!user) {
+    return c.json({ success: false, error: 'User creation failed' }, 500);
+  }
   await authRepository.createAuditLog(user.id, 'USER_CREATED');
   return c.json({ success: true, data: user, message: 'Pengguna berhasil dibuat' }, 201);
 });
